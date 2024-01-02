@@ -131,70 +131,11 @@ func main() {
 			tVars[ii] = bVars[ii][i]
 		}
 		ys := generatePatterns(pattern, 0, v, 0, tVars, []int{})
-		fmt.Println(ys)
-		// clauses = append(clauses, ys)
+		//fmt.Println(ys)
+		clauses = append(clauses, ys)
 		
 	}
 
-
-
-	/*
-	for i, v := range expandedDBoard {
-		for j, vv := range v {
-			if vv == -1 {
-				continue
-			}
-
-			// vars around target cell
-			tVars := []int{}
-			for ii := -1; ii <= 1; ii++ {
-				for jj := -1; jj <= 1; jj++ {
-					tVars = append(tVars, expandedDBoardVars[i+ii][j+jj])
-				}
-			}
-			// Determine
-			if vv == 0 {
-				for _, v := range tVars {
-					clauses = append(clauses, Clause{-v})
-				}
-				continue
-			}
-			// Determine
-			if vv == 9 {
-				for _, v := range tVars {
-					clauses = append(clauses, Clause{v})
-				}
-				continue
-			}
-
-			if vv == 8 {
-				c := []int{}
-				for _, v := range tVars {
-					c = append(c, -v)
-				}
-				clauses = append(clauses, c)
-			}
-
-			// true isNot Positive
-			for k := vv; k < 8; k++ {
-				comb(k+1, 9-(k+1), false, tVars)
-			}
-
-			if vv == 1 {
-				c := []int{}
-				for _, v := range tVars {
-					c = append(c, v)
-				}
-				clauses = append(clauses, c)
-			}
-
-			// false is Postive
-			for k := 9 - vv; k < 8; k++ {
-				comb(k+1, 9-(k+1), true, tVars)
-			}
-		}
-	}
-	*/
 
 	cnf := clausesToString(clauses, seq()-1)
 
@@ -303,19 +244,19 @@ func generatePatterns(pattern []bool, position int, rules []int, ruleIndex int, 
 
 // printPattern はパターンを出力するヘルパー関数です。
 func printPattern(pattern []bool, tVars, ys []int) ([]int){
-	var sb strings.Builder
+	// var sb strings.Builder
 	c := Clause{}
 	t := seq()
 	for i, filled := range pattern {
 		if filled {
 			//c = append(c, tVars[i])
 			clauses = append(clauses, Clause{-t,tVars[i]})
-			sb.WriteString("■ ")
+			// sb.WriteString("■ ")
 		} else {
 			c = append(c, -tVars[i])
 	//		clauses = append(clauses, Clause{t})
 			clauses = append(clauses, Clause{-t,-tVars[i]})
-			sb.WriteString("□ ")
+			// sb.WriteString("□ ")
 		}
 	}
 	ys = append(ys, t)
