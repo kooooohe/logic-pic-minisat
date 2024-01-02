@@ -49,8 +49,7 @@ func spiteColumnRow(ts [][]int) ([][]int, [][]int) {
 		rs[ii] = ts[i]
 		ii++
 	}
-	return cs, rs
-
+	return rs, cs
 }
 func main() {
 	if len(os.Args) < 2 {
@@ -117,22 +116,24 @@ func main() {
 	for i,v:= range rRules {
 		// rules := []int{3, 1, 2}
 		// width := 10
-		pattern := make([]bool, columnNum/*width*/) 
-		ys := generatePatterns(pattern, 0, v, 0, bVars[i], []int{})
-		clauses = append(clauses, ys)
+		// pattern := make([]bool, columnNum/*width*/) 
+		//ys := generatePatterns(pattern, 0, v, 0, bVars[i], []int{})
+		generatePatternsIteratively(columnNum,v, bVars[i])
+		//clauses = append(clauses, ys)
 		// fmt.Println(ys)
 	}
 	for i,v:= range cRules {
 		// rules := []int{3, 1, 2}
 		// width := 10
-		pattern := make([]bool, rowNum/*height*/) 
+		// pattern := make([]bool, rowNum/*height*/) 
 		tVars := make([]int, rowNum)
 		for ii := 0; ii<rowNum; ii++ {
 			tVars[ii] = bVars[ii][i]
 		}
-		ys := generatePatterns(pattern, 0, v, 0, tVars, []int{})
+		generatePatternsIteratively(rowNum,v, tVars)
+		// ys := generatePatterns(pattern, 0, v, 0, tVars, []int{})
 		//fmt.Println(ys)
-		clauses = append(clauses, ys)
+		//clauses = append(clauses, ys)
 		
 	}
 
@@ -147,6 +148,113 @@ func main() {
 	}
 	fmt.Println("CNF file generated successfully:", fOut)
 }
+
+
+/// ===
+
+/*
+func main() {
+	rules := []int{3, 1, 2}
+	width := 10
+	generatePatternsIteratively(width, rules)
+}
+*/
+
+func generatePatternsIteratively(width int, rules, tVars[]int) {
+	pattern := make([]bool, width)
+	ys := []int{}
+	for {
+		if isValidPattern(pattern, rules) {
+			y:=printPattern2(pattern, tVars)
+			ys = append(ys,y)
+		}
+		if isLastPattern(pattern) {
+			break
+		}
+		nextPattern(pattern)
+	}
+	clauses = append(clauses,ys)
+}
+
+func nextPattern(pattern []bool) {
+	for i := len(pattern) - 1; i >= 0; i-- {
+		if !pattern[i] {
+			pattern[i] = true
+			for j := i + 1; j < len(pattern); j++ {
+				pattern[j] = false
+			}
+			return
+		}
+	}
+}
+
+func isValidPattern(pattern []bool, rules []int) bool {
+	ruleIndex := 0
+	count := 0
+
+	for _, v := range pattern {
+		if v {
+			count++
+		} else if count > 0 {
+			if ruleIndex >= len(rules) || count != rules[ruleIndex] {
+				return false
+			}
+			ruleIndex++
+			count = 0
+		}
+	}
+
+	if count > 0 {
+		if ruleIndex >= len(rules) || count != rules[ruleIndex] {
+			return false
+		}
+		ruleIndex++
+	}
+
+	return ruleIndex == len(rules)
+}
+
+func isLastPattern(pattern []bool) bool {
+	for _, v := range pattern {
+		if !v {
+			return false
+		}
+	}
+	return true
+}
+
+func printPattern2(pattern []bool, tVars []int) (y int){
+	c := Clause{}
+	t := seq()
+	for i, filled := range pattern {
+		if filled {
+			//c = append(c, tVars[i])
+			clauses = append(clauses, Clause{-t,tVars[i]})
+			// sb.WriteString("■ ")
+		} else {
+			c = append(c, -tVars[i])
+	//		clauses = append(clauses, Clause{t})
+			clauses = append(clauses, Clause{-t,-tVars[i]})
+			// sb.WriteString("□ ")
+		}
+	}
+	return t
+	/*
+	var sb strings.Builder
+	for _, filled := range pattern {
+		if filled {
+			sb.WriteString("■ ")
+		} else {
+			sb.WriteString("□ ")
+		}
+	}
+	fmt.Println(sb.String())
+	*/
+}
+
+
+/// ===
+
 
 func board(fName string) [][]int {
 	var board [][]int
