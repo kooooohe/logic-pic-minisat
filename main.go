@@ -49,7 +49,7 @@ func spiteColumnRow(ts [][]int) ([][]int, [][]int) {
 		rs[ii] = ts[i]
 		ii++
 	}
-	return cs, rs
+	return rs, cs
 
 }
 func main() {
